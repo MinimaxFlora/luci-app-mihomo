@@ -27,6 +27,7 @@ jobs:
     outputs:
       latest_tag: ${{ steps.info.outputs.latest_tag }}
       latest_version: ${{ steps.info.outputs.latest_version }}
+      checksum: ${{ steps.info.outputs.checksum }}
     steps:
       - id: checkout
         name: checkout
@@ -39,10 +40,20 @@ jobs:
       - id: info
         name: info
         run: |
+          umask 0022
           latest_tag=$(git -C mihomo tag --sort=-v:refname | head -n 1)
           latest_version=${latest_tag#v}
+          git -C mihomo checkout "$latest_tag"
+          commit_timestamp=$(git -C mihomo log -n 1 --format=%cd --date=format:%s)
+          pkg_name="mihomo"
+          pkg_source_dir="${pkg_name}-${latest_version}"
+          pkg_source="${pkg_source_dir}.tar.gz"
+          mkdir -p "${pkg_source_dir}"
+          git -C mihomo archive --format=tar HEAD | tar -x -f - -C "${pkg_source_dir}"
+          tar --numeric-owner --owner=0 --group=0 --mode=a-s --sort=name --mtime="@${commit_timestamp}" -c "${pkg_source_dir}" | gzip -n -c > "${pkg_source}"
           echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
           echo "latest_version=$latest_version" >> $GITHUB_OUTPUT
+          echo "checksum=$(sha256sum ${pkg_source} | cut -d ' ' -f 1)" >> $GITHUB_OUTPUT
   update:
     needs:
       - get_current_info
@@ -63,6 +74,7 @@ jobs:
           sed -i "s/PKG_VERSION:=.*/PKG_VERSION:=${{ needs.get_latest_info.outputs.latest_version }}/" luci-app-mihomo/mihomo/Makefile
           sed -i "s/PKG_SOURCE_VERSION:=.*/PKG_SOURCE_VERSION:=${{ needs.get_latest_info.outputs.latest_tag }}/" luci-app-mihomo/mihomo/Makefile
           sed -i "s/PKG_BUILD_VERSION:=.*/PKG_BUILD_VERSION:=${{ needs.get_latest_info.outputs.latest_tag }}/" luci-app-mihomo/mihomo/Makefile
+          sed -i "s/PKG_MIRROR_HASH:=.*/PKG_MIRROR_HASH:=${{ needs.get_latest_info.outputs.checksum }}/" luci-app-mihomo/mihomo/Makefile
       - id: pr
         name: pr
         uses: peter-evans/create-pull-request@v8
