@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Wiki / 文档
+    about: Check it before start a new issue
+    url: https://github.com/MinimaxFlora/luci-app-mihomo/wiki
+  - name: FAQ / 常见问题
+    about: Check it before start a new issue
+    url: https://github.com/MinimaxFlora/luci-app-mihomo/wiki/FAQ
+  - name: Changelog / 更新日志
+    about: Check it before start a new issue
+    url: https://github.com/MinimaxFlora/luci-app-mihomo/wiki/Changelog
+  - name: How To Ask Questions The Smart Way / 提问的智慧
+    about: Read it before start a new issue
+    url: http://www.catb.org/~esr/faqs/smart-questions.html
