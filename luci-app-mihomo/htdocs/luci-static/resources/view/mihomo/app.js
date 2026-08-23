@@ -217,10 +217,10 @@ function buildDashboard(data) {
             ])
         ]),
         E('div', { class: 'mihomo-dash-actions' }, [
-            actionButton('action', _('Reload Service'), function () { return mihomo.reload(); }),
-            actionButton('negative', _('Restart Service'), function () { return mihomo.restart(); }),
-            actionButton('positive', _('Update Dashboard'), function () { return mihomo.updateDashboard(); }),
-            actionButton('button', _('Open Dashboard'), function () { return mihomo.openDashboard(); })
+            actionButton('action', '🔄 ' + _('Reload Service'), function () { return mihomo.reload(); }),
+            actionButton('negative', '⏹️ ' + _('Restart Service'), function () { return mihomo.restart(); }),
+            actionButton('positive', '⬆️ ' + _('Update Dashboard'), function () { return mihomo.updateDashboard(); }),
+            actionButton('button', '🌐 ' + _('Open Dashboard'), function () { return mihomo.openDashboard(); })
         ])
     ]);
 }
