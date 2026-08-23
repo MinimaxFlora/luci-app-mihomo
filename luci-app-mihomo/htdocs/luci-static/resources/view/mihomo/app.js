@@ -76,7 +76,7 @@ function confirmUpdate(text, updater) {
     ]);
 }
 
-function runUpdate(promiseFn, successMsg, doReload) {
+function runUpdate(promiseFn, successMsg) {
     return L.resolveDefault(promiseFn())
         .then(function (res) {
             if (res && res.success === false) {
@@ -86,43 +86,40 @@ function runUpdate(promiseFn, successMsg, doReload) {
 
             showNotice(E('span', successMsg), 'alert-success');
 
-            if (doReload)
-                setTimeout(function () { location.reload(); }, 1500);
-            else
-                return L.resolveDefault(mihomo.checkUpdates()).then(refreshUpdates);
+            setTimeout(function () { location.reload(); }, 1500);
         })
         .catch(function (err) {
             showNotice(E('p', _('An error occurred: %s').format(err)), 'alert-danger');
         });
 }
 
-function renderCheckResult(tileId, label, value, info, updater, confirmText, doReload) {
+function renderCheckResult(tileId, label, value, info, updater, confirmText) {
     var tile = document.getElementById(tileId);
 
     if (!tile)
         return;
 
-    var content;
+    var action;
 
     if (info && info.update_available) {
         var btn = E('button', { type: 'button', class: 'cbi-button cbi-button-action' }, _('Update'));
 
         btn.addEventListener('click', function () {
             confirmUpdate(confirmText, function () {
-                runUpdate(updater, _('Update completed'), doReload);
+                runUpdate(updater, _('Update completed'));
             });
         });
 
-        content = E('div', { class: 'mihomo-tile-update' }, [
+        action = E('span', { class: 'mihomo-tile-inline' }, [
             E('span', { class: 'mihomo-update-badge' }, info.latest),
             btn
         ]);
     }
     else if (info && info.latest) {
-        content = E('div', { class: 'mihomo-update-ok' }, _('Up to date'));
+        action = E('span', { class: 'mihomo-update-ok' }, _('Up to date'));
     }
     else if (info) {
-        content = E('div', { class: 'mihomo-update-err' }, _('Update check failed'));
+        action = E('span', { class: 'mihomo-update-err' }, _('Update check failed'));
     }
     else {
         return;
@@ -130,28 +127,14 @@ function renderCheckResult(tileId, label, value, info, updater, confirmText, doR
 
     dom.content(tile, [
         E('div', { class: 'mihomo-tile-label' }, label),
-        E('div', { class: 'mihomo-tile-value' }, value || '-'),
-        content
+        E('div', { class: 'mihomo-tile-line' }, [
+            E('span', { class: 'mihomo-tile-value' }, value || '-'),
+            action
+        ])
     ]);
 }
 
-function refreshUpdates(updates) {
-    if (!updates)
-        return;
-
-    var appInfo = updates.app || {};
-    var coreInfo = updates.core || {};
-
-    renderCheckResult('mihomo_tile_app', _('App Version'), appInfo.current, appInfo,
-        function () { return mihomo.updateApp(); },
-        _('Update the LuCI app to the latest version?'), true);
-
-    renderCheckResult('mihomo_tile_core', _('Core Version'), coreInfo.current, coreInfo,
-        function () { return mihomo.updateCore(); },
-        _('Update the mihomo core to the latest version? The service will be restarted.'), false);
-}
-
-function versionTile(tileId, label, value, updater, confirmText, doReload) {
+function versionTile(tileId, label, value, kind, updater, confirmText) {
     var checkBtn = E('button', { type: 'button', class: 'cbi-button cbi-button-button' }, _('Check for updates'));
 
     checkBtn.addEventListener('click', function () {
@@ -159,7 +142,12 @@ function versionTile(tileId, label, value, updater, confirmText, doReload) {
         checkBtn.textContent = _('Checking…');
 
         L.resolveDefault(mihomo.checkUpdates())
-            .then(refreshUpdates)
+            .then(function (updates) {
+                var info = updates ? (kind === 'app' ? updates.app : updates.core) : null;
+
+                renderCheckResult(tileId, label, info ? info.current : value, info,
+                    updater, confirmText);
+            })
             .catch(function (err) {
                 checkBtn.disabled = false;
                 checkBtn.textContent = _('Check for updates');
@@ -169,8 +157,10 @@ function versionTile(tileId, label, value, updater, confirmText, doReload) {
 
     return E('div', { class: 'mihomo-tile', id: tileId || null }, [
         E('div', { class: 'mihomo-tile-label' }, label),
-        E('div', { class: 'mihomo-tile-value' }, value || '-'),
-        E('div', { class: 'mihomo-tile-update' }, [checkBtn])
+        E('div', { class: 'mihomo-tile-line' }, [
+            E('span', { class: 'mihomo-tile-value' }, value || '-'),
+            checkBtn
+        ])
     ]);
 }
 
@@ -189,12 +179,12 @@ function buildDashboard(data) {
                 E('div', { class: 'mihomo-tile-label' }, _('Core Status')),
                 E('div', { class: 'mihomo-tile-value' }, renderStatus(running))
             ]),
-            versionTile('mihomo_tile_app', _('App Version'), appVersion,
+            versionTile('mihomo_tile_app', _('App Version'), appVersion, 'app',
                 function () { return mihomo.updateApp(); },
-                _('Update the LuCI app to the latest version?'), true),
-            versionTile('mihomo_tile_core', _('Core Version'), coreVersion,
+                _('Update the LuCI app to the latest version?')),
+            versionTile('mihomo_tile_core', _('Core Version'), coreVersion, 'core',
                 function () { return mihomo.updateCore(); },
-                _('Update the mihomo core to the latest version? The service will be restarted.'), false),
+                _('Update the mihomo core to the latest version? The service will be restarted.')),
             E('div', { class: 'mihomo-tile' }, [
                 E('div', { class: 'mihomo-tile-label' }, _('Current Profile')),
                 E('div', { class: 'mihomo-tile-value' }, resolveProfileLabel())
