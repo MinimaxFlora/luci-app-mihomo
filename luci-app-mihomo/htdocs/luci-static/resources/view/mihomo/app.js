@@ -72,7 +72,7 @@ function bindAction(button, promiseFn) {
 function actionButton(style, title, promiseFn) {
     var btn = E('button', {
         type: 'button',
-        class: 'cbi-button cbi-button-' + style
+        class: 'cbi-button ' + style
     }, title);
 
     bindAction(btn, promiseFn);
@@ -217,10 +217,10 @@ function buildDashboard(data) {
             ])
         ]),
         E('div', { class: 'mihomo-dash-actions' }, [
-            actionButton('action', '🔄 ' + _('Reload Service'), function () { return mihomo.reload(); }),
-            actionButton('negative', '⏹️ ' + _('Restart Service'), function () { return mihomo.restart(); }),
-            actionButton('positive', '⬆️ ' + _('Update Dashboard'), function () { return mihomo.updateDashboard(); }),
-            actionButton('button', '🌐 ' + _('Open Dashboard'), function () { return mihomo.openDashboard(); })
+            actionButton('mihomo-btn-pink', '🔄 ' + _('Reload Service'), function () { return mihomo.reload(); }),
+            actionButton('mihomo-btn-pink', '⏹️ ' + _('Restart Service'), function () { return mihomo.restart(); }),
+            actionButton('mihomo-btn-pink', '⬆️ ' + _('Update Dashboard'), function () { return mihomo.updateDashboard(); }),
+            actionButton('mihomo-btn-pink', '🌐 ' + _('Open Dashboard'), function () { return mihomo.openDashboard(); })
         ])
     ]);
 }
