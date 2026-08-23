@@ -9,10 +9,11 @@ PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/MetaCubeX/mihomo.git
 PKG_SOURCE_VERSION:=v1.19.30
-# NOTE: no PKG_MIRROR_HASH on purpose. The workflow rewrites PKG_VERSION per
-# release tag, which changes the archive file name (mihomo-<ver>.tar.gz), so a
-# static hash can never match. Source integrity is guaranteed by pinning
-# PKG_SOURCE_VERSION to the git tag v1.19.30.
+# OpenWrt SDK (24.10+) enforces PKG_MIRROR_HASH for git sources; the
+# multi-arch release workflow builds the Makefile as-is (no PKG_VERSION
+# rewrite), so the archive name stays mihomo-1.19.30.tar.gz and the hash
+# is stable across the gh-action-sdk images (as upstream nikki does).
+PKG_MIRROR_HASH:=31caf16c4060193e817db55831058c83d7b3dcba490983d4da489dfed3973327
 
 PKG_LICENSE:=GPL3.0+
 PKG_MAINTAINER:=MinimaxFlora <265198154+MinimaxFlora@users.noreply.github.com>
