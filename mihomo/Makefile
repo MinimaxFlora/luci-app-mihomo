@@ -9,7 +9,10 @@ PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/MetaCubeX/mihomo.git
 PKG_SOURCE_VERSION:=v1.19.30
-PKG_MIRROR_HASH:=49e010c902a9a2ede12816f02877eabe6b22d96f0ab6ead700c66e73e9edd7dc
+# NOTE: no PKG_MIRROR_HASH on purpose. The workflow rewrites PKG_VERSION per
+# release tag, which changes the archive file name (mihomo-<ver>.tar.gz), so a
+# static hash can never match. Source integrity is guaranteed by pinning
+# PKG_SOURCE_VERSION to the git tag v1.19.30.
 
 PKG_LICENSE:=GPL3.0+
 PKG_MAINTAINER:=MinimaxFlora <265198154+MinimaxFlora@users.noreply.github.com>
