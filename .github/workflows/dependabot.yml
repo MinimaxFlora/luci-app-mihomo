@@ -1,0 +1,75 @@
+name: dependabot
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  get_current_info:
+    runs-on: ubuntu-latest
+    outputs:
+      pkg_source_version: ${{ steps.info.outputs.pkg_source_version }}
+    steps:
+      - id: checkout
+        name: checkout
+        uses: actions/checkout@v6
+        with:
+          repository: MinimaxFlora/luci-app-mihomo
+          ref: master
+          path: luci-app-mihomo
+      - id: info
+        name: info
+        run: |
+          echo "pkg_source_version=$(grep "PKG_SOURCE_VERSION:=" luci-app-mihomo/mihomo/Makefile | cut -d '=' -f 2)" >> $GITHUB_OUTPUT
+  get_latest_info:
+    runs-on: ubuntu-latest
+    outputs:
+      latest_tag: ${{ steps.info.outputs.latest_tag }}
+      latest_version: ${{ steps.info.outputs.latest_version }}
+    steps:
+      - id: checkout
+        name: checkout
+        uses: actions/checkout@v6
+        with:
+          repository: 'MetaCubeX/mihomo'
+          ref: 'Meta'
+          path: 'mihomo'
+          fetch-tags: true
+      - id: info
+        name: info
+        run: |
+          latest_tag=$(git -C mihomo tag --sort=-v:refname | head -n 1)
+          latest_version=${latest_tag#v}
+          echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
+          echo "latest_version=$latest_version" >> $GITHUB_OUTPUT
+  update:
+    needs:
+      - get_current_info
+      - get_latest_info
+    if: ${{ needs.get_current_info.outputs.pkg_source_version != needs.get_latest_info.outputs.latest_tag }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        name: checkout
+        uses: actions/checkout@v6
+        with:
+          repository: MinimaxFlora/luci-app-mihomo
+          ref: master
+          path: luci-app-mihomo
+      - id: update
+        name: update
+        run: |
+          sed -i "s/PKG_VERSION:=.*/PKG_VERSION:=${{ needs.get_latest_info.outputs.latest_version }}/" luci-app-mihomo/mihomo/Makefile
+          sed -i "s/PKG_SOURCE_VERSION:=.*/PKG_SOURCE_VERSION:=${{ needs.get_latest_info.outputs.latest_tag }}/" luci-app-mihomo/mihomo/Makefile
+          sed -i "s/PKG_BUILD_VERSION:=.*/PKG_BUILD_VERSION:=${{ needs.get_latest_info.outputs.latest_tag }}/" luci-app-mihomo/mihomo/Makefile
+      - id: pr
+        name: pr
+        uses: peter-evans/create-pull-request@v8
+        with:
+          path: luci-app-mihomo
+          branch: dependabot/mihomo
+          commit-message: "chore: update mihomo to ${{ needs.get_latest_info.outputs.latest_tag }}"
+          title: "chore: update mihomo to ${{ needs.get_latest_info.outputs.latest_tag }}"
+          body: |
+            [Changelog](https://github.com/MetaCubeX/mihomo/compare/${{ needs.get_current_info.outputs.pkg_source_version }}...${{ needs.get_latest_info.outputs.latest_tag }})
