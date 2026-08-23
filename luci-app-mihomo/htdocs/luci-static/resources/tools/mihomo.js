@@ -64,6 +64,24 @@ const callMihomoDebug = rpc.declare({
     expect: { '': {} }
 });
 
+const callMihomoCheckUpdates = rpc.declare({
+    object: 'luci.mihomo',
+    method: 'check_updates',
+    expect: { '': {} }
+});
+
+const callMihomoUpdateApp = rpc.declare({
+    object: 'luci.mihomo',
+    method: 'update_app',
+    expect: { '': {} }
+});
+
+const callMihomoUpdateCore = rpc.declare({
+    object: 'luci.mihomo',
+    method: 'update_core',
+    expect: { '': {} }
+});
+
 const homeDir = '/etc/mihomo';
 const profilesDir = `${homeDir}/profiles`;
 const subscriptionsDir = `${homeDir}/subscriptions`;
@@ -153,6 +171,20 @@ return baseclass.extend({
         '    border-top: 1px solid rgba(128, 128, 128, .22);',
         '}',
         '.mihomo-dash-actions .cbi-button { margin: 0; }',
+        '/* ===== version update tiles ===== */',
+        '.mihomo-tile-update {',
+        '    display: flex; align-items: center; justify-content: space-between; gap: 8px;',
+        '    margin-top: 10px; padding-top: 8px;',
+        '    border-top: 1px solid rgba(128, 128, 128, .18);',
+        '}',
+        '.mihomo-update-badge {',
+        '    font-size: 12px; font-weight: 700;',
+        '    color: var(--warning-color, #cc8800);',
+        '    background: rgba(204, 136, 0, .12);',
+        '    padding: 2px 8px; border-radius: 10px;',
+        '}',
+        '.mihomo-tile-update .cbi-button { margin: 0; font-size: 12px; padding: 2px 10px; }',
+        '.mihomo-update-ok { margin-top: 8px; font-size: 12px; color: var(--success-color, #16a34a); }',
         '/* ===== profile usage bar ===== */',
         '.mihomo-usage { min-width: 120px; }',
         '.mihomo-usage-text { font-size: 12px; }',
@@ -343,5 +375,17 @@ return baseclass.extend({
 
     debug: function () {
         return callMihomoDebug();
+    },
+
+    checkUpdates: function () {
+        return callMihomoCheckUpdates();
+    },
+
+    updateApp: function () {
+        return callMihomoUpdateApp();
+    },
+
+    updateCore: function () {
+        return callMihomoUpdateCore();
     },
 })

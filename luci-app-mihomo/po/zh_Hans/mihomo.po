@@ -1148,3 +1148,37 @@ msgstr "用户代理（UA）"
 
 msgid "Username"
 msgstr "用户名"
+
+#: luci-app-mihomo/htdocs/luci-static/resources/view/mihomo/app.js:70
+msgid "Cancel"
+msgstr "取消"
+
+#: luci-app-mihomo/htdocs/luci-static/resources/view/mihomo/app.js:67
+msgid "Confirm Update"
+msgstr "确认更新"
+
+#: luci-app-mihomo/htdocs/luci-static/resources/view/mihomo/app.js:117
+msgid "Up to date"
+msgstr "已是最新版本"
+
+#: luci-app-mihomo/htdocs/luci-static/resources/view/mihomo/app.js:120
+msgid "Update check failed"
+msgstr "检查更新失败"
+
+#: luci-app-mihomo/htdocs/luci-static/resources/view/mihomo/app.js:107
+msgid "Update completed"
+msgstr "更新完成"
+
+#: luci-app-mihomo/htdocs/luci-static/resources/view/mihomo/app.js:83
+msgid "Update failed: %s"
+msgstr "更新失败：%s"
+
+#: luci-app-mihomo/htdocs/luci-static/resources/view/mihomo/app.js:145
+msgid "Update the LuCI app to the latest version?"
+msgstr "确定将 LuCI 插件更新到最新版本？"
+
+#: luci-app-mihomo/htdocs/luci-static/resources/view/mihomo/app.js:179
+msgid ""
+"Update the mihomo core to the latest version? The service will be "
+"restarted."
+msgstr "确定将 mihomo 核心更新到最新版本？服务将会重启。"
