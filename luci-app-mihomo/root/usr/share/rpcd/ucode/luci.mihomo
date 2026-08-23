@@ -248,7 +248,7 @@ const methods = {
 			if (system(['curl', '-sL', '-m', '300', '-o', tmp, asset.browser_download_url]) != 0)
 				return { success: false, error: 'download failed' };
 			const ok = is_apk
-				? system(['apk', 'add', '--force', '--allow-untrusted', tmp]) == 0
+				? system(['apk', 'add', '--allow-untrusted', tmp]) == 0
 				: system(['opkg', 'install', '--force-reinstall', tmp]) == 0;
 			system(['rm', '-f', tmp]);
 			return { success: ok, error: ok ? '' : 'install failed' };

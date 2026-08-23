@@ -185,6 +185,7 @@ return baseclass.extend({
         '}',
         '.mihomo-tile-update .cbi-button { margin: 0; font-size: 12px; padding: 2px 10px; }',
         '.mihomo-update-ok { margin-top: 8px; font-size: 12px; color: var(--success-color, #16a34a); }',
+        '.mihomo-update-err { margin-top: 8px; font-size: 12px; color: var(--danger-color, #dc2626); }',
         '/* ===== profile usage bar ===== */',
         '.mihomo-usage { min-width: 120px; }',
         '.mihomo-usage-text { font-size: 12px; }',

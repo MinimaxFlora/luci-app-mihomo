@@ -1182,3 +1182,11 @@ msgid ""
 "Update the mihomo core to the latest version? The service will be "
 "restarted."
 msgstr "确定将 mihomo 核心更新到最新版本？服务将会重启。"
+
+#: luci-app-mihomo/htdocs/luci-static/resources/view/mihomo/app.js:155
+msgid "Check for updates"
+msgstr "检测更新"
+
+#: luci-app-mihomo/htdocs/luci-static/resources/view/mihomo/app.js:159
+msgid "Checking…"
+msgstr "检查中…"

@@ -96,8 +96,13 @@ function runUpdate(promiseFn, successMsg, doReload) {
         });
 }
 
-function versionTile(tileId, label, value, info, updater, confirmText, doReload) {
-    var updateRow = null;
+function renderCheckResult(tileId, label, value, info, updater, confirmText, doReload) {
+    var tile = document.getElementById(tileId);
+
+    if (!tile)
+        return;
+
+    var content;
 
     if (info && info.update_available) {
         var btn = E('button', { type: 'button', class: 'cbi-button cbi-button-action' }, _('Update'));
@@ -108,22 +113,25 @@ function versionTile(tileId, label, value, info, updater, confirmText, doReload)
             });
         });
 
-        updateRow = E('div', { class: 'mihomo-tile-update' }, [
+        content = E('div', { class: 'mihomo-tile-update' }, [
             E('span', { class: 'mihomo-update-badge' }, info.latest),
             btn
         ]);
     }
     else if (info && info.latest) {
-        updateRow = E('div', { class: 'mihomo-update-ok' }, _('Up to date'));
+        content = E('div', { class: 'mihomo-update-ok' }, _('Up to date'));
     }
     else if (info) {
-        updateRow = E('div', { class: 'mihomo-update-ok' }, _('Update check failed'));
+        content = E('div', { class: 'mihomo-update-err' }, _('Update check failed'));
+    }
+    else {
+        return;
     }
 
-    return E('div', { class: 'mihomo-tile', id: tileId || null }, [
+    dom.content(tile, [
         E('div', { class: 'mihomo-tile-label' }, label),
         E('div', { class: 'mihomo-tile-value' }, value || '-'),
-        updateRow
+        content
     ]);
 }
 
@@ -131,35 +139,45 @@ function refreshUpdates(updates) {
     if (!updates)
         return;
 
-    var appTile = document.getElementById('mihomo_tile_app');
-    var coreTile = document.getElementById('mihomo_tile_core');
-
     var appInfo = updates.app || {};
     var coreInfo = updates.core || {};
 
-    if (appTile) {
-        appTile.textContent = '';
-        dom.content(appTile, versionTile(_('App Version'), appInfo.current,
-            { update_available: appInfo.update_available, latest: appInfo.latest },
-            function () { return mihomo.updateApp(); },
-            _('Update the LuCI app to the latest version?'), true));
-    }
+    renderCheckResult('mihomo_tile_app', _('App Version'), appInfo.current, appInfo,
+        function () { return mihomo.updateApp(); },
+        _('Update the LuCI app to the latest version?'), true);
 
-    if (coreTile) {
-        coreTile.textContent = '';
-        dom.content(coreTile, versionTile(_('Core Version'), coreInfo.current,
-            { update_available: coreInfo.update_available, latest: coreInfo.latest },
-            function () { return mihomo.updateCore(); },
-            _('Update the mihomo core to the latest version? The service will be restarted.'), false));
-    }
+    renderCheckResult('mihomo_tile_core', _('Core Version'), coreInfo.current, coreInfo,
+        function () { return mihomo.updateCore(); },
+        _('Update the mihomo core to the latest version? The service will be restarted.'), false);
 }
 
-function buildDashboard(data, updates) {
+function versionTile(tileId, label, value, updater, confirmText, doReload) {
+    var checkBtn = E('button', { type: 'button', class: 'cbi-button cbi-button-button' }, _('Check for updates'));
+
+    checkBtn.addEventListener('click', function () {
+        checkBtn.disabled = true;
+        checkBtn.textContent = _('Checking…');
+
+        L.resolveDefault(mihomo.checkUpdates())
+            .then(refreshUpdates)
+            .catch(function (err) {
+                checkBtn.disabled = false;
+                checkBtn.textContent = _('Check for updates');
+                showNotice(E('p', _('An error occurred: %s').format(err)), 'alert-danger');
+            });
+    });
+
+    return E('div', { class: 'mihomo-tile', id: tileId || null }, [
+        E('div', { class: 'mihomo-tile-label' }, label),
+        E('div', { class: 'mihomo-tile-value' }, value || '-'),
+        E('div', { class: 'mihomo-tile-update' }, [checkBtn])
+    ]);
+}
+
+function buildDashboard(data) {
     const appVersion = data[1]?.app ?? '';
     const coreVersion = data[1]?.core ?? '';
     const running = data[2];
-    const appInfo = updates?.app ?? null;
-    const coreInfo = updates?.core ?? null;
 
     return E('div', { class: 'mihomo-dash' }, [
         E('div', { class: 'mihomo-dash-head' }, [
@@ -171,10 +189,10 @@ function buildDashboard(data, updates) {
                 E('div', { class: 'mihomo-tile-label' }, _('Core Status')),
                 E('div', { class: 'mihomo-tile-value' }, renderStatus(running))
             ]),
-            versionTile('mihomo_tile_app', _('App Version'), appVersion, appInfo,
+            versionTile('mihomo_tile_app', _('App Version'), appVersion,
                 function () { return mihomo.updateApp(); },
                 _('Update the LuCI app to the latest version?'), true),
-            versionTile('mihomo_tile_core', _('Core Version'), coreVersion, coreInfo,
+            versionTile('mihomo_tile_core', _('Core Version'), coreVersion,
                 function () { return mihomo.updateCore(); },
                 _('Update the mihomo core to the latest version? The service will be restarted.'), false),
             E('div', { class: 'mihomo-tile' }, [
@@ -201,8 +219,7 @@ return view.extend({
             uci.load('mihomo'),
             mihomo.version(),
             mihomo.status(),
-            mihomo.listProfiles(),
-            L.resolveDefault(mihomo.checkUpdates(), null)
+            mihomo.listProfiles()
         ]);
     },
     render: function (data) {
@@ -329,7 +346,7 @@ return view.extend({
                 return L.resolveDefault(mihomo.status()).then(updateStatus);
             });
 
-            return E([buildDashboard(data, data[4]), node]);
+            return E([buildDashboard(data), node]);
         });
     }
 });
