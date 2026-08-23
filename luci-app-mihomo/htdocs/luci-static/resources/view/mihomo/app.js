@@ -48,10 +48,36 @@ function updateStatus(running) {
     }
 }
 
-function runAction(promise) {
-    return L.resolveDefault(promise).catch(function (err) {
-        ui.addNotification(null, E('p', _('An error occurred: %s').format(err)), 8000);
+function bindAction(button, promiseFn) {
+    button.addEventListener('click', function (ev) {
+        if (button.disabled)
+            return;
+
+        ev.preventDefault();
+        button.disabled = true;
+
+        return L.resolveDefault(promiseFn())
+            .then(function () {
+                return L.resolveDefault(mihomo.status()).then(updateStatus);
+            })
+            .catch(function (err) {
+                showNotice(E('p', _('An error occurred: %s').format(err)), 'alert-danger');
+            })
+            .finally(function () {
+                button.disabled = false;
+            });
     });
+}
+
+function actionButton(style, title, promiseFn) {
+    var btn = E('button', {
+        type: 'button',
+        class: 'cbi-button cbi-button-' + style
+    }, title);
+
+    bindAction(btn, promiseFn);
+
+    return btn;
 }
 
 function showNotice(content, cls) {
@@ -191,14 +217,10 @@ function buildDashboard(data) {
             ])
         ]),
         E('div', { class: 'mihomo-dash-actions' }, [
-            E('button', { type: 'button', class: 'cbi-button cbi-button-action', click: function () { return runAction(mihomo.reload()); } },
-                '🔄 ' + _('Reload Service')),
-            E('button', { type: 'button', class: 'cbi-button cbi-button-negative', click: function () { return runAction(mihomo.restart()); } },
-                '⏹️ ' + _('Restart Service')),
-            E('button', { type: 'button', class: 'cbi-button cbi-button-positive', click: function () { return runAction(mihomo.updateDashboard()); } },
-                '⬆️ ' + _('Update Dashboard')),
-            E('button', { type: 'button', class: 'cbi-button cbi-button-apply', click: function () { return runAction(mihomo.openDashboard()); } },
-                '🌐 ' + _('Open Dashboard'))
+            actionButton('action', _('Reload Service'), function () { return mihomo.reload(); }),
+            actionButton('negative', _('Restart Service'), function () { return mihomo.restart(); }),
+            actionButton('positive', _('Update Dashboard'), function () { return mihomo.updateDashboard(); }),
+            actionButton('button', _('Open Dashboard'), function () { return mihomo.openDashboard(); })
         ])
     ]);
 }
