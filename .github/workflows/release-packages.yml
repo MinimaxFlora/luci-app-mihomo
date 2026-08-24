@@ -59,7 +59,7 @@ jobs:
         env:
           ARCH: ${{ matrix.arch }}-${{ matrix.branch }}
           FEEDNAME: mihomo
-          PACKAGES: mihomo luci-app-mihomo luci-i18n-mihomo-zh-cn
+          PACKAGES: mihomo luci-app-mihomo
           INDEX: 1
           KEY_BUILD: ${{ secrets.KEY_BUILD }}
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
