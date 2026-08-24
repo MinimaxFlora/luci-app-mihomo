@@ -1,6 +1,12 @@
 # luci-app-mihomo
 
+[![Docs](https://img.shields.io/badge/docs-doc.kejizero.xyz-ec4899)](https://doc.kejizero.xyz/)
+[![latest version](https://img.shields.io/github/release/MinimaxFlora/luci-app-mihomo)](https://github.com/MinimaxFlora/luci-app-mihomo/releases)
+[![license](https://img.shields.io/github/license/MinimaxFlora/luci-app-mihomo)](LICENSE)
+
 在 OpenWrt 上使用 Mihomo 进行透明代理的 LuCI 插件(基于 [nikkinikki-org/OpenWrt-nikki](https://github.com/nikkinikki-org/OpenWrt-nikki) 移植)。
+
+**📚 文档站:[https://doc.kejizero.xyz/](https://doc.kejizero.xyz/)**(用户指南 / 安装教程 / 配置指南 / FAQ / 更新日志,中英双语,源码见 [MinimaxFlora/Mihomo-Docs](https://github.com/MinimaxFlora/Mihomo-Docs))
 
 本仓库包含两个包:
 
@@ -18,6 +24,47 @@
 - 订阅管理(URL / UA / 用量 / 到期时间 / 手动更新)
 - 定时重启、日志轮转清理、调试日志下载
 - 状态仪表盘(运行状态 / 版本 / 当前配置 / 快捷操作)
+- 插件/核心一键在线更新
+
+## 安装
+
+### 一键脚本
+
+```shell
+# 自动检测架构与固件版本,下载解压安装(自动安装缺失的 tar/gzip/curl)
+curl -fsSL https://raw.githubusercontent.com/MinimaxFlora/luci-app-mihomo/master/install.sh > install-mihomo.sh && sh install-mihomo.sh
+```
+
+### 软件源(opkg/apk)
+
+```shell
+# 添加官方软件源(自动检测固件版本与架构,安装签名公钥)
+curl -fsSL https://raw.githubusercontent.com/MinimaxFlora/luci-app-mihomo/master/feed.sh > feed-mihomo.sh && sh feed-mihomo.sh
+
+# 安装
+opkg install luci-app-mihomo        # OpenWrt 24.10
+apk add --allow-untrusted luci-app-mihomo   # OpenWrt 25.12
+```
+
+软件源地址:`https://feed.kejizero.xyz/<分支>/<架构>/mihomo`
+
+### 手动安装
+
+从 [GitHub Releases](https://github.com/MinimaxFlora/luci-app-mihomo/releases) 或[文档站下载页](https://doc.kejizero.xyz/guide/installation/download.html)下载对应架构的压缩包,解压后安装:
+
+```shell
+tar -xzf mihomo_<架构>-openwrt-<版本>.tar.gz
+# OpenWrt 24.10
+opkg install --force-reinstall bin/packages/*/mihomo/mihomo_*.ipk bin/packages/*/mihomo/luci-app-mihomo_*.ipk
+# OpenWrt 25.12
+apk add --allow-untrusted bin/packages/*/mihomo/mihomo-*.apk bin/packages/*/mihomo/luci-app-mihomo-*.apk
+```
+
+### 卸载
+
+```shell
+curl -fsSL https://raw.githubusercontent.com/MinimaxFlora/luci-app-mihomo/master/uninstall.sh > uninstall-mihomo.sh && sh uninstall-mihomo.sh
+```
 
 ## 环境要求
 
@@ -29,7 +76,7 @@
 
 ```shell
 # 将本仓库加入 feeds(二选一)
-echo "src-git mihomo https://github.com/MinimaxFlora/luci-app-mihomo.git;main" >> "feeds.conf.default"
+echo "src-git mihomo https://github.com/MinimaxFlora/luci-app-mihomo.git;master" >> "feeds.conf.default"
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 
@@ -39,20 +86,10 @@ make package/luci-app-mihomo/compile
 ```
 
 编译产物位于 `bin/packages/<架构>/` 下:
+
 - `mihomo`(核心)
 - `luci-app-mihomo`(前端)
 - `luci-i18n-mihomo-zh-cn`(简体中文翻译)
-
-## 安装
-
-```shell
-# opkg
-opkg install mihomo luci-app-mihomo luci-i18n-mihomo-zh-cn
-# apk
-apk add mihomo luci-app-mihomo luci-i18n-mihomo-zh-cn
-```
-
-也可以在 LuCI「系统 → 软件包」中安装。安装后到「服务 → Mihomo」中上传/订阅配置并启用。
 
 ## 依赖
 
@@ -69,7 +106,10 @@ apk add mihomo luci-app-mihomo luci-i18n-mihomo-zh-cn
 
 ## 发布
 
-打 tag(如 `v1.0.0`)自动触发 GitHub Actions 构建,使用 ImmortalWrt SDK 24.10.5(ipk)与 25.12.0(apk)产出全部三个包并发布到 Releases。
+打 tag(如 `v1.0.2`)自动触发 GitHub Actions:
+
+1. **release**:openwrt/gh-action-sdk 多架构构建(24 架构 × openwrt-24.10/25.12),产物发布到 Releases
+2. **feed**:构建完成后自动将 opkg/apk 软件源部署到 Cloudflare Pages([https://feed.kejizero.xyz](https://feed.kejizero.xyz),含签名公钥)
 
 ## 致谢
 
