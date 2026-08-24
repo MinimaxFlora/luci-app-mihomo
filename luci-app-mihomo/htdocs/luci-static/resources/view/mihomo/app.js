@@ -242,7 +242,7 @@ return view.extend({
 
         let m, s, o;
 
-        m = new form.Map('mihomo', _('Mihomo'), `${_('Transparent Proxy with Mihomo on OpenWrt.')} <a href="https://github.com/MinimaxFlora/luci-app-mihomo" target="_blank">${_('How To Use')}</a>`);
+        m = new form.Map('mihomo', _('Mihomo'), `${_('Transparent Proxy with Mihomo on OpenWrt.')} <a href="https://doc.kejizero.xyz/" target="_blank">${_('How To Use')}</a>`);
 
         s = m.section(form.NamedSection, 'config', 'config', _('App Config'));
 
