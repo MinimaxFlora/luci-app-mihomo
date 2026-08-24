@@ -105,7 +105,8 @@ def build_html(data):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mihomo Feed — OpenWrt 软件源</title>
 <meta name="description" content="Mihomo 核心与 LuCI 插件 OpenWrt 软件源, 支持 openwrt-24.10 (ipk) 与 openwrt-25.12 (apk), usign/APK 签名校验">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23ec4899'/%3E%3Ctext x='16' y='23' font-size='18' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="/logo.png">
+<link rel="apple-touch-icon" href="/logo.png">
 <style>
 :root {{
   --bg: #0b0b10;
@@ -147,10 +148,9 @@ nav {{
 }}
 nav .container {{ display:flex; align-items:center; justify-content:space-between; height:60px; }}
 .logo {{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:17px; }}
-.logo-badge {{
-  width:30px; height:30px; border-radius:8px; display:grid; place-items:center;
-  background: linear-gradient(135deg, var(--pink), #a855f7);
-  color:#fff; font-weight:800; font-size:15px; box-shadow: 0 4px 16px rgba(236,72,153,.35);
+.logo-img {{
+  width:30px; height:30px; border-radius:7px; object-fit:contain;
+  box-shadow: 0 4px 16px rgba(236,72,153,.25);
 }}
 .nav-links {{ display:flex; gap:22px; font-size:14px; color:var(--muted); }}
 .nav-links a {{ color:var(--muted); transition:color .15s; }}
@@ -295,7 +295,7 @@ footer .sep {{ margin:0 10px; opacity:.4; }}
 <body>
 <nav>
   <div class="container">
-    <div class="logo"><span class="logo-badge">M</span> Mihomo Feed</div>
+    <div class="logo"><img class="logo-img" src="/logo.png" alt="Mihomo"> Mihomo Feed</div>
     <div class="nav-links">
       <a href="https://github.com/MinimaxFlora/luci-app-mihomo" target="_blank" rel="noopener">GitHub</a>
       <a href="https://doc.kejizero.xyz" target="_blank" rel="noopener">文档</a>
@@ -473,6 +473,12 @@ def main():
     if not data:
         print("未找到包数据, 检查目录:", ROOT)
         sys.exit(1)
+    # 复制品牌 logo 到输出目录 (nav/favicon 引用 /logo.png)
+    logo_src = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.png")
+    if os.path.exists(logo_src):
+        import shutil
+        shutil.copy(logo_src, os.path.join(ROOT, "logo.png"))
+        print("已复制 logo.png")
     html = build_html(data)
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(html)
