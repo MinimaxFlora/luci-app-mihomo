@@ -120,8 +120,18 @@ install_pkg() {
     echo "[Mihomo] 安装软件包..."
     if [ "$BRANCH" = "25.12" ]; then
         apk add --allow-untrusted "$PKGDIR"/mihomo-*.apk "$PKGDIR"/luci-app-mihomo-*.apk
+        # 汉化包 (部分旧版本发布未包含,存在才安装)
+        I18N_APKS="$(ls "$PKGDIR"/luci-i18n-mihomo-zh-cn-*.apk 2>/dev/null || true)"
+        if [ -n "$I18N_APKS" ]; then
+            apk add --allow-untrusted $I18N_APKS
+        fi
     else
         opkg install --force-reinstall "$PKGDIR"/mihomo_*.ipk "$PKGDIR"/luci-app-mihomo_*.ipk
+        # 汉化包 (部分旧版本发布未包含,存在才安装)
+        I18N_IPKS="$(ls "$PKGDIR"/luci-i18n-mihomo-zh-cn_*.ipk 2>/dev/null || true)"
+        if [ -n "$I18N_IPKS" ]; then
+            opkg install --force-reinstall $I18N_IPKS
+        fi
     fi
 
     rm -rf bin "$FILE"
