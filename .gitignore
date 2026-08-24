@@ -1,0 +1,7 @@
+# ===== 签名密钥 / 构建产物, 严禁提交 =====
+.keys/
+key-build
+key-build.pub
+private-key.pem
+public-key.pem
+*.pem
