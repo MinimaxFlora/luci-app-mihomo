@@ -358,7 +358,16 @@ return view.extend({
                 return L.resolveDefault(mihomo.status()).then(updateStatus);
             });
 
-            return E([buildDashboard(data), node]);
+            // 将状态总览插入到页面标题/描述(cbi-map-descr)之后、配置项之前
+            const dash = buildDashboard(data);
+            const anchor = node.querySelector('.cbi-map-descr') || node.querySelector('h2');
+
+            if (anchor && anchor.nextSibling)
+                node.insertBefore(dash, anchor.nextSibling);
+            else
+                node.appendChild(dash);
+
+            return node;
         });
     }
 });
