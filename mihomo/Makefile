@@ -1,19 +1,19 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mihomo
-PKG_VERSION:=1.19.32
+PKG_VERSION:=1.19.33
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/MetaCubeX/mihomo.git
-PKG_SOURCE_VERSION:=v1.19.32
+PKG_SOURCE_VERSION:=v1.19.33
 # OpenWrt SDK (24.10+) enforces PKG_MIRROR_HASH for git sources; the
 # multi-arch release workflow builds the Makefile as-is (no PKG_VERSION
 # rewrite), so the archive name stays mihomo-1.19.30.tar.gz and the hash
 # is stable across the gh-action-sdk images (as upstream nikki does).
-PKG_MIRROR_HASH:=0194b7039e6ff1143c7b80dd70d3a06976f60ff9f40802111d15a93da06c8a95
+PKG_MIRROR_HASH:=f29117485648124b819d5f790a27fceef3f8e2a9aceec6b12584bd99c8ab3fdf
 
 PKG_LICENSE:=GPL3.0+
 PKG_MAINTAINER:=MinimaxFlora <265198154+MinimaxFlora@users.noreply.github.com>
@@ -22,7 +22,7 @@ PKG_BUILD_DEPENDS:=golang/host
 PKG_BUILD_PARALLEL:=1
 PKG_BUILD_FLAGS:=no-mips16
 
-PKG_BUILD_VERSION:=v1.19.32
+PKG_BUILD_VERSION:=v1.19.33
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 PKG_BUILD_TIME:=$(shell date -u -Iseconds)
 
